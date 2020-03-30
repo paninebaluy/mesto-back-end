@@ -10,7 +10,8 @@ const getAllCards = (req, res, next) => {
 // POST /cards — создаёт карточку
 const postCard = (req, res, next) => {
   const { name, link } = req.body;
-  Card.create({ name, link })
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
     .then((card) => res.status(201, 'Created').json({ data: card }))
     .catch(next); // passes the data to errorHandler middleware
 };
@@ -28,8 +29,26 @@ const deleteCard = (req, res, next) => {
     .catch(next); // passes the data to errorHandler middleware
 };
 
+// PUT /cards/:cardId/likes — поставить лайк карточке
+const likeCard = (req, res, next) => {
+  Card.findByIdAndUpdate(req.params.id, { $addToSet: { likes: req.user._id } }, { new: true })
+    .then((card) => res.status(200, 'OK').json({ data: card }))
+    .catch(next); // passes the data to errorHandler middleware
+};
+
+const dislikeCard = (req, res, next) => {
+  Card.findByIdAndUpdate(req.params.id, { $pull: { likes: req.user._id } }, { new: true })
+    .then((card) => res.status(200, 'OK').json({ message: 'like removed:', data: card }))
+    .catch(next); // passes the data to errorHandler middleware
+};
+
+
+// DELETE /cards/:cardId/likes — убрать лайк с карточки
+
 module.exports = {
   getAllCards,
   postCard,
   deleteCard,
+  likeCard,
+  dislikeCard,
 };
