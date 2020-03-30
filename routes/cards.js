@@ -1,7 +1,12 @@
-const getCardData = require('express').Router({ mergeParams: true });
+const router = require('express').Router({ mergeParams: true });
 
-const cards = require('../data/cards');
+const { getAllCards, postCard, deleteCard } = require('../controllers/cards');
+const { cardErrorHandler } = require('../middleware/errorHandler');
 
-getCardData.get('/', (req, res) => res.status(200).send(cards));
+router.get('/', getAllCards);
+router.post('/', postCard);
+router.delete('/:id', deleteCard);
+// an error handler is the last middleware:
+router.use(cardErrorHandler);
 
-module.exports = getCardData;
+module.exports = router;
