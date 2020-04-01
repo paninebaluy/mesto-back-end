@@ -1,49 +1,78 @@
 const Card = require('../models/card');
 
 // GET /cards — возвращает все карточки
-const getAllCards = (req, res, next) => {
-  Card.find({})
-    .then((cards) => res.status(200, 'OK').json({ data: cards }))
-    .catch(next); // passes the data to errorHandler middleware
-};
+const getAllCards = (async (req, res, next) => {
+  const cards = await Card.find({})
+    .sort({ createdAt: -1 })
+    .populate('likes');
+  try {
+    res.status(200).send({ data: cards });
+  } catch (err) {
+    next(err); // passes the data to errorHandler middleware
+  }
+});
 
 // POST /cards — создаёт карточку
-const postCard = (req, res, next) => {
+const postCard = (async (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
-  Card.create({ name, link, owner })
-    .then((card) => res.status(201, 'Created').json({ data: card }))
-    .catch(next); // passes the data to errorHandler middleware
-};
+  try {
+    const card = await Card.create({ name, link, owner: req.user._id });
+    res.status(201).send({ data: card });
+  } catch (err) {
+    next(err); // passes the data to errorHandler middleware
+  }
+});
 
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
-const deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.id)
-    .then((card) => {
-      if (card !== null) {
-        res.status(200, 'OK').json({ message: 'card deleted:', data: card });
-      } else {
-        next();
-      }
-    })
-    .catch(next); // passes the data to errorHandler middleware
-};
+async function deleteCard(req, res, next) {
+  try {
+    const card = await Card.findById(req.params.id);
+    if (card && (req.user._id.toString() !== card.owner.toString())) {
+      throw new Error('Unauthorized'); // passes the data to errorHandler middleware
+    }
+    if (!card || !req.params.id) {
+      throw new Error('Not Found'); // passes the data to errorHandler middleware
+    }
+    const cardToDelete = await Card.findByIdAndRemove(req.params.id)
+      .populate('likes');
+    res.status(200).send({ message: 'card deleted:', data: cardToDelete });
+  } catch (err) {
+    next(err); // passes the data to errorHandler middleware
+  }
+}
 
 // PUT /cards/:cardId/likes — поставить лайк карточке
-const likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.id, { $addToSet: { likes: req.user._id } }, { new: true })
-    .then((card) => res.status(200, 'OK').json({ data: card }))
-    .catch(next); // passes the data to errorHandler middleware
-};
-
-const dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.id, { $pull: { likes: req.user._id } }, { new: true })
-    .then((card) => res.status(200, 'OK').json({ message: 'like removed:', data: card }))
-    .catch(next); // passes the data to errorHandler middleware
-};
-
+async function likeCard(req, res, next) {
+  try {
+    const card = await Card.findByIdAndUpdate(req.params.id, {
+      $addToSet: { likes: req.user._id },
+    }, { new: true })
+      .populate('likes');
+    if (!card || !req.params.id) {
+      throw new Error('Not Found'); // passes the data to errorHandler middleware
+    }
+    res.status(200).send({ data: card });
+  } catch (err) {
+    next(err); // passes the data to errorHandler middleware
+  }
+}
 
 // DELETE /cards/:cardId/likes — убрать лайк с карточки
+async function dislikeCard(req, res, next) {
+  try {
+    const card = await Card.findByIdAndUpdate(req.params.id, {
+      $pull: { likes: req.user._id },
+    }, { new: true })
+      .populate('likes');
+    if (!card || !req.params.id) {
+      throw new Error('Not Found'); // passes the data to errorHandler middleware
+    }
+    res.status(200).send({ message: 'like removed:', data: card });
+  } catch (err) {
+    next(err); // passes the data to errorHandler middleware
+  }
+}
+
 
 module.exports = {
   getAllCards,
