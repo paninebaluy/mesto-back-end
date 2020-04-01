@@ -1,57 +1,69 @@
 const User = require('../models/user');
 
 // GET /users — возвращает всех пользователей
-const getAllUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => res.status(200, 'OK').json({ data: users }))
-    .catch(next); // passes the data to error handler
-};
+const getAllUsers = (async (req, res, next) => {
+  try {
+    const users = await User.find({})
+      .sort('name');
+    res.status(200).send({ data: users });
+  } catch (err) {
+    next(err); // passes the data to error handler
+  }
+});
 
 // GET /users/:userId - возвращает пользователя по _id
-const getUser = (req, res, next) => {
-  User.findById(req.params.id)
-    .then((user) => res.status(200, 'OK').json({ data: user }))
-    .catch(next); // passes the data to error handler
-};
+const getUser = (async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user || !req.params.id) {
+      throw new Error('Not Found'); // passes the data to errorHandler middleware
+    }
+    res.status(200).send({ data: user });
+  } catch (err) {
+    next(err); // passes the data to error handler
+  }
+});
 
 // POST /users — создаёт пользователя
-const createUser = (req, res, next) => {
+const createUser = (async (req, res, next) => {
   const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201, 'Created').json({ data: user }))
-    .catch(next); // passes the data to error handler
-};
+  try {
+    const user = await User.create({ name, about, avatar });
+    res.status(201).send({ data: user });
+  } catch (err) {
+    next(err); // passes the data to error handler
+  }
+});
 
 // PATCH /users/me — обновляет профиль
-const updateUserProfile = (req, res, next) => {
+const updateUserProfile = (async (req, res, next) => {
   const { name, about, avatar } = req.body;
-
-  User.findByIdAndUpdate(req.user._id, req.body, { new: true, runValidators: true })
-    .then((user) => {
-      if (name || about || avatar) {
-        res.status(200, 'OK').json({ data: user });
-      } else {
-        res.status(400, 'Bad Request').json({ message: 'Not a valid property' }); // этот обработчик работает только здесь :(
-      }
-    })
-    .catch(next); // passes the data to error handler
-};
+  try {
+    const user = await User.findByIdAndUpdate(req.user._id, req.body,
+      { new: true, runValidators: true });
+    if (!(name || about || avatar)) {
+      throw new Error('One or more of fields required: name, about, avatar');
+    }
+    res.status(200).send({ data: user });
+  } catch (err) {
+    next(err); // passes the data to error handler
+  }
+});
 
 // PATCH /users/me/avatar — обновляет аватар
-const updateUserAvatar = (req, res, next) => {
+const updateUserAvatar = (async (req, res, next) => {
   const { avatar } = req.body;
-
-  User.findByIdAndUpdate(req.user._id, req.body, { new: true, runValidators: true })
-    .then((user) => {
-      if (avatar) {
-        res.status(200, 'OK').json({ data: user });
-      } else {
-        res.status(400, 'Bad Request').json({ message: 'Not a valid property' }); // этот обработчик работает только здесь :(
-      }
-    })
-    .catch(next); // passes the data to error handler
-};
+  try {
+    const user = await User.findByIdAndUpdate(req.user._id, req.body,
+      { new: true, runValidators: true });
+    if (!avatar) {
+      throw new Error('One or more of fields required: avatar');
+    }
+    res.status(200).send({ data: user });
+  } catch (err) {
+    next(err); // passes the data to error handler
+  }
+});
 
 module.exports = {
   getAllUsers,
