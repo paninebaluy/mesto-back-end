@@ -1,48 +1,41 @@
-const User = require('../models/user');
-const Card = require('../models/card');
+// eslint-disable-next-line no-unused-vars
+const errorHandler = (err, req, res, next) => {
+  const baseHandler = (error) => {
+    res.status(error.status || 500).send({
+      error: {
+        status: error.status,
+        message: error.message,
+      },
+    });
+  };
+  const error = err;
 
-const userErrorHandler = (error, req, res, next) => {
-  if (req.method !== 'GET' && req.user._id !== User._id) {
-    res.sendStatus(403).json({ message: error.message });
+  // wrong id errors
+  if (err.message.includes('Cast to ObjectId failed'
+   || err.message.includes("Cannot read property 'data' of null"))) {
+    error.status = 400;
+    error.message = 'ObjectID does not exist';
+    return baseHandler(error);
   }
-  if (!User.about || !User.name || !User.avatar) {
-    res.status(400, 'Bad Request').send({ message: error.message });
+  // validation errors
+  if (err.message.includes('Not enough data')
+  || err.message.includes('validation failed')
+  || err.message.includes('Validation failed')
+  || err.message.includes('One or more of fields required')) {
+    error.status = 400;
+    return baseHandler(error);
   }
-  if ((req.method === 'POST' || req.method === 'GET') && !User._id) {
-    res.status(404, 'Not Found').json({ message: error.message });
+  // 403 unauthorized
+  if (err.message.includes('Unauthorized')) {
+    error.status = 403;
+    return baseHandler(error);
   }
-  if (req.method === 'PATCH' && req.originalUrl === '/users/me'
-    && (!req.body.name || !req.body.about || !req.body.avatar)) {
-    res.status(400, 'Bad Request').json({ message: error.message });
+  // 404 errors
+  if (err.message.includes('Not Found')) {
+    error.status = 404;
+    return baseHandler(error);
   }
-  if (req.method === 'PATCH' && !req.body.avatar && req.originalUrl === 'users/me/avatar') {
-    res.status(400, 'Bad Request').json({ message: error.message });
-  }
-  res.sendStatus(500).json({ message: error.message });
-
-  next();
+  return baseHandler(err); // 500 by default
 };
 
-const cardErrorHandler = (error, req, res, next) => {
-  if (req.method !== 'GET' && req.user._id !== Card.owner) {
-    res.sendStatus(403).json({ message: error.message });
-  }
-  if (!Card.name || !Card.link) {
-    res.status(400).json({ message: error.message });
-  }
-  if (!Card._id || !Card) {
-    res.status(404, 'Not Found').json({ message: error.message });
-  }
-  if (res.body.data === null) {
-    res.status(404, 'Not Found').json({ message: error.message });
-  }
-  res.sendStatus(500);
-
-  next();
-};
-
-
-module.exports = {
-  userErrorHandler,
-  cardErrorHandler,
-};
+module.exports = errorHandler;

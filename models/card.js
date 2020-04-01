@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -10,16 +11,22 @@ const cardSchema = new mongoose.Schema({
   link: {
     required: true,
     type: String,
-    match: /^https?:\/\/(w{3}\.)?(?!www)(([А-ЯЁа-яёA-Za-z1-9_-]+\.[А-ЯЁа-яёA-Za-z1-9_-]+(\.[А-ЯЁа-яёA-Za-z_-]+){0,2})|(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)))(:\d{2,5})?(\/[A-Za-z1-9/-]*)?#?.*$/i,
+    validate: {
+      validator: (value) => validator.isURL(value, {
+        protocols: ['http', 'https'], require_tld: true, require_protocol: true, require_host: true, require_valid_protocol: true, allow_underscores: true, disallow_auth: true,
+      }),
+      message: 'Must be a Valid URL',
+    },
   },
   owner: {
     type: mongoose.Types.ObjectId,
     ref: 'user',
   },
-  likes: {
-    type: Array,
-    default: [], // implicit, so this field is optional
-  },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    default: [],
+  }],
   createdAt: {
     type: Date,
     default: Date.now,
