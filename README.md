@@ -61,11 +61,6 @@ It's way more convenient to test routing scenarios using [Postman](https://www.p
 + Express.js
 + MongoDB
 + Mongoose
-+ Native JS
-+ HTML
-+ CSS
-+ Git
-+ Webpack
 
 [To top/Наверх](#Mesto)
 
@@ -130,10 +125,5 @@ $> npm run start
 + Express.js
 + MongoDB
 + Mongoose
-+ Нативный JS
-+ HTMLEditing praktikum12_README.md at develop-webpack · paninebaluy_praktikum12
-+ CSS
-+ Git
-+ Webpack
 
 [To top/Наверх](#Mesto)
