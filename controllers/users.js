@@ -1,4 +1,8 @@
+const mongoose = require('mongoose');
+
 const User = require('../models/user');
+const NotFoundError = require('../errors/notFoundError');
+const InternalServerError = require('../errors/internalServerError');
 
 // GET /users — возвращает всех пользователей
 const getAllUsers = (async (req, res, next) => {
@@ -15,11 +19,11 @@ const getAllUsers = (async (req, res, next) => {
 const getUser = (async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user || !req.params.id) {
-      throw new Error('Not Found'); // passes the data to errorHandler middleware
-    }
     res.status(200).send({ data: user });
   } catch (err) {
+    if (err instanceof mongoose.CastError) {
+      next(new NotFoundError('Not Found'));
+    }
     next(err); // passes the data to error handler
   }
 });
@@ -37,13 +41,13 @@ const createUser = (async (req, res, next) => {
 
 // PATCH /users/me — обновляет профиль
 const updateUserProfile = (async (req, res, next) => {
-  const { name, about, avatar } = req.body;
+  const { name, about } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(req.user._id, req.body,
-      { new: true, runValidators: true });
-    if (!(name || about || avatar)) {
-      throw new Error('One or more of fields required: name, about, avatar');
+    if (!(name || about)) {
+      throw new InternalServerError('One or more of fields required: name, about');
     }
+    const user = await User.findByIdAndUpdate(req.user._id, { name, about },
+      { new: true, runValidators: true });
     res.status(200).send({ data: user });
   } catch (err) {
     next(err); // passes the data to error handler
@@ -54,11 +58,11 @@ const updateUserProfile = (async (req, res, next) => {
 const updateUserAvatar = (async (req, res, next) => {
   const { avatar } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(req.user._id, req.body,
-      { new: true, runValidators: true });
     if (!avatar) {
-      throw new Error('One or more of fields required: avatar');
+      throw new InternalServerError('One or more of fields required: avatar');
     }
+    const user = await User.findByIdAndUpdate(req.user._id, { avatar },
+      { new: true, runValidators: true });
     res.status(200).send({ data: user });
   } catch (err) {
     next(err); // passes the data to error handler
