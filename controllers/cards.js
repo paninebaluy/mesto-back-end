@@ -1,4 +1,8 @@
+const mongoose = require('mongoose');
+
 const Card = require('../models/card');
+const ForbiddenError = require('../errors/forbiddenError');
+const NotFoundError = require('../errors/notFoundError');
 
 // GET /cards — возвращает все карточки
 const getAllCards = (async (req, res, next) => {
@@ -24,54 +28,65 @@ const postCard = (async (req, res, next) => {
 });
 
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
-async function deleteCard(req, res, next) {
+const deleteCard = (async (req, res, next) => {
   try {
     const card = await Card.findById(req.params.id);
-    if (card && (req.user._id.toString() !== card.owner.toString())) {
-      throw new Error('Unauthorized'); // passes the data to errorHandler middleware
+    if (!card) {
+      throw new NotFoundError('Not Found');
     }
-    if (!card || !req.params.id) {
-      throw new Error('Not Found'); // passes the data to errorHandler middleware
+    if (card && !card.owner.equals(req.user._id)) {
+      throw new ForbiddenError('Unauthorized'); // passes the data to errorHandler middleware
     }
     const cardToDelete = await Card.findByIdAndRemove(req.params.id)
       .populate('likes');
-    res.status(200).send({ message: 'card deleted:', data: cardToDelete });
+    return res.status(200).send({ message: 'card deleted:', data: cardToDelete });
   } catch (err) {
-    next(err); // passes the data to errorHandler middleware
+    if (err instanceof mongoose.CastError) {
+      return next(new NotFoundError('Not Found'));
+    }
+    return next(err); // passes the data to errorHandler middleware
   }
-}
+});
 
 // PUT /cards/:cardId/likes — поставить лайк карточке
-async function likeCard(req, res, next) {
+const likeCard = (async (req, res, next) => {
   try {
-    const card = await Card.findByIdAndUpdate(req.params.id, {
+    const card = await Card.findById(req.params.id);
+    if (!card) {
+      throw new NotFoundError('Not Found');
+    }
+    const cardToUpdate = await Card.findByIdAndUpdate(req.params.id, {
       $addToSet: { likes: req.user._id },
     }, { new: true })
       .populate('likes');
-    if (!card || !req.params.id) {
-      throw new Error('Not Found'); // passes the data to errorHandler middleware
-    }
-    res.status(200).send({ data: card });
+    res.status(200).send({ data: cardToUpdate });
   } catch (err) {
+    if (err instanceof mongoose.CastError) {
+      next(new NotFoundError('Not Found'));
+    }
     next(err); // passes the data to errorHandler middleware
   }
-}
+});
 
 // DELETE /cards/:cardId/likes — убрать лайк с карточки
-async function dislikeCard(req, res, next) {
+const dislikeCard = (async (req, res, next) => {
   try {
-    const card = await Card.findByIdAndUpdate(req.params.id, {
+    const card = await Card.findById(req.params.id);
+    if (!card) {
+      throw new NotFoundError('Not Found');
+    }
+    const cardToDislike = await Card.findByIdAndUpdate(req.params.id, {
       $pull: { likes: req.user._id },
     }, { new: true })
       .populate('likes');
-    if (!card || !req.params.id) {
-      throw new Error('Not Found'); // passes the data to errorHandler middleware
-    }
-    res.status(200).send({ message: 'like removed:', data: card });
+    res.status(200).send({ message: 'like removed:', data: cardToDislike });
   } catch (err) {
+    if (err instanceof mongoose.CastError) {
+      next(new NotFoundError('Not Found'));
+    }
     next(err); // passes the data to errorHandler middleware
   }
-}
+});
 
 
 module.exports = {

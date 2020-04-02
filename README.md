@@ -2,7 +2,7 @@
 ## EN
 [на русском](#ru)
 
-_v1.2.0 &ndash; completed all required routing scenarios and error handling_
+_v1.2.1 &ndash; completed all required routing scenarios and error handling_
 
 Mesto is a single page project, part of sprint 13 in [Yandex.Praktikum](https://praktikum.yandex.ru/profile/web-developer/) study program.
 It's an interactive web page for sharing pictures with short titles.
@@ -72,7 +72,7 @@ It's way more convenient to test routing scenarios using [Postman](https://www.p
 # Mesto
 ## RU
 
-_v1.2.0 &ndash; реализован роутинг для всех необходимых сценариев и обработка ошибок_
+_v1.2.1 &ndash; реализован роутинг для всех необходимых сценариев и обработка ошибок_
 
 Место &mdash; одностраничный проект, созданный в рамках 13-го спринта учебной программы [Яндекс.Практикума](https://praktikum.yandex.ru/profile/web-developer/). Это интерактивный сайт, пользователи которого могут делиться изображениями с кратким названием.
 Этот проект сосредоточен на бэкенде сайта, где роутинг реализован на Node.js и Exress.js, а также подключена база данных на MongoDB посредством Mongoose. 
