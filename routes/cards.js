@@ -1,7 +1,13 @@
-const getCardData = require('express').Router({ mergeParams: true });
+const router = require('express').Router({ mergeParams: true });
 
-const cards = require('../data/cards');
+const {
+  getAllCards, postCard, deleteCard, likeCard, dislikeCard,
+} = require('../controllers/cards');
 
-getCardData.get('/', (req, res) => res.status(200).send(cards));
+router.get('/', getAllCards);
+router.post('/', postCard);
+router.delete('/:id', deleteCard);
+router.put('/:id/likes', likeCard);
+router.delete('/:id/likes', dislikeCard);
 
-module.exports = getCardData;
+module.exports = router;
