@@ -1,15 +1,13 @@
-const mongoose = require('mongoose');
-
 const Card = require('../models/card');
 const ForbiddenError = require('../errors/forbiddenError');
 const NotFoundError = require('../errors/notFoundError');
 
 // GET /cards — возвращает все карточки
 const getAllCards = (async (req, res, next) => {
-  const cards = await Card.find({})
-    .sort({ createdAt: -1 })
-    .populate('likes');
   try {
+    const cards = await Card.find({})
+      .sort({ createdAt: -1 })
+      .populate('likes');
     res.status(200).send({ data: cards });
   } catch (err) {
     next(err); // passes the data to errorHandler middleware
@@ -18,8 +16,8 @@ const getAllCards = (async (req, res, next) => {
 
 // POST /cards — создаёт карточку
 const postCard = (async (req, res, next) => {
-  const { name, link } = req.body;
   try {
+    const { name, link } = req.body;
     const card = await Card.create({ name, link, owner: req.user._id });
     res.status(201).send({ data: card });
   } catch (err) {
@@ -39,12 +37,9 @@ const deleteCard = (async (req, res, next) => {
     }
     const cardToDelete = await Card.findByIdAndRemove(req.params.id)
       .populate('likes');
-    return res.status(200).send({ message: 'card deleted:', data: cardToDelete });
+    res.status(200).send({ message: 'card deleted:', data: cardToDelete });
   } catch (err) {
-    if (err instanceof mongoose.CastError) {
-      return next(new NotFoundError('Not Found'));
-    }
-    return next(err); // passes the data to errorHandler middleware
+    next(err); // passes the data to errorHandler middleware
   }
 });
 
@@ -61,9 +56,6 @@ const likeCard = (async (req, res, next) => {
       .populate('likes');
     res.status(200).send({ data: cardToUpdate });
   } catch (err) {
-    if (err instanceof mongoose.CastError) {
-      next(new NotFoundError('Not Found'));
-    }
     next(err); // passes the data to errorHandler middleware
   }
 });
@@ -81,9 +73,6 @@ const dislikeCard = (async (req, res, next) => {
       .populate('likes');
     res.status(200).send({ message: 'like removed:', data: cardToDislike });
   } catch (err) {
-    if (err instanceof mongoose.CastError) {
-      next(new NotFoundError('Not Found'));
-    }
     next(err); // passes the data to errorHandler middleware
   }
 });
