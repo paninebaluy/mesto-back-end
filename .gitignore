@@ -18,3 +18,5 @@ node_modules
 
 #config
 config.js
+.eslintrc
+.editorconfig
