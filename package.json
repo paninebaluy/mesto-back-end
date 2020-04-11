@@ -1,6 +1,6 @@
 {
   "name": "sprint14",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "Praktikum 14 project. That is a Praktikum 11 project plus routing with Express.js, connection to MongoDB via Mongoose, and authorization + authentication. For more info, see Readme.md",
   "main": "app.js",
   "scripts": {
@@ -10,7 +10,6 @@
   "author": "Natalia Dolgushina",
   "license": "MIT",
   "devDependencies": {
-    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
@@ -18,24 +17,15 @@
     "nodemon": "^2.0.2"
   },
   "dependencies": {
-    "autoprefixer": "^9.7.5",
-    "babel-polyfill": "^6.26.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
-    "core-js": "^3.6.4",
-    "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
-    "escape-html": "^1.0.3",
     "express": "^4.17.1",
-    "express-rate-limit": "^5.1.1",
-    "express-slow-down": "^1.3.1",
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.6",
-    "mongoose-beautiful-unique-validation": "^7.1.1",
     "mongoose-unique-validator": "^2.0.3",
-    "safe-regex": "^2.1.1",
     "validator": "^13.0.0"
   }
 }

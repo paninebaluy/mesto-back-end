@@ -15,3 +15,6 @@ node_modules
 
 # ENV-files
 .env
+
+#config
+config.js
