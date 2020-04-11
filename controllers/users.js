@@ -40,13 +40,13 @@ const createUser = (async (req, res, next) => {
       name, about, avatar, email, password,
     } = req.body;
     if (password.length < 8) {
-      next(new BadRequestError('Password must be at least 8 symbols long'));
+      return next(new BadRequestError('Password must be at least 8 symbols long'));
     }
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
       name, about, avatar, email, password: hash,
     });
-    res.status(201).send({
+    return res.status(201).send({
       data: {
         _id: user._id,
         name: user.name,
@@ -55,7 +55,10 @@ const createUser = (async (req, res, next) => {
       },
     }); // данные всех полей должны приходить в теле запроса (кроме пароля)
   } catch (err) {
-    next(new BadRequestError(err.message)); // passes the data to error handler
+    if (err instanceof mongoose.Error.ValidationError) {
+      return next(new BadRequestError(err.message));
+    }
+    return next(err); // passes the data to error handler
   }
 });
 

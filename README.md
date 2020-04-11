@@ -2,7 +2,7 @@
 ## EN
 [на русском](#ru)
 
-_v2.0.0 &ndash; added JWT-based authorization and authentication_
+_v2.0.1 &ndash; added JWT-based authorization and authentication_
 
 Mesto is a single page project, part of sprint 13/14 in [Yandex.Praktikum](https://praktikum.yandex.ru/profile/web-developer/) study program.
 It's an interactive web page for sharing pictures with short titles.
@@ -69,7 +69,7 @@ It's way more convenient to test routing scenarios using [Postman](https://www.p
 # Mesto
 ## RU
 
-_v2.0.0 добавлены авторизация и аутентификация на базе JWT-токена_
+_v2.0.1 добавлены авторизация и аутентификация на базе JWT-токена_
 
 Место &mdash; одностраничный проект, созданный в рамках 13-го и 14-го спринта учебной программы [Яндекс.Практикума](https://praktikum.yandex.ru/profile/web-developer/). Это интерактивный сайт, пользователи которого могут делиться изображениями с кратким названием.
 Этот проект сосредоточен на бэкенде сайта, где роутинг реализован на Node.js и Exress.js, а также подключена база данных на MongoDB посредством Mongoose.
