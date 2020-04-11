@@ -7,7 +7,8 @@ const getAllCards = (async (req, res, next) => {
   try {
     const cards = await Card.find({})
       .sort({ createdAt: -1 })
-      .populate('likes');
+      .populate('likes')
+      .populate('owner');
     res.status(200).send({ data: cards });
   } catch (err) {
     next(err); // passes the data to errorHandler middleware
@@ -30,16 +31,16 @@ const deleteCard = (async (req, res, next) => {
   try {
     const card = await Card.findById(req.params.id);
     if (!card) {
-      throw new NotFoundError('Not Found');
+      return next(new NotFoundError('Not Found'));
     }
     if (card && !card.owner.equals(req.user._id)) {
-      throw new ForbiddenError('Unauthorized'); // passes the data to errorHandler middleware
+      next(new ForbiddenError('Unauthorized')); // passes the data to errorHandler middleware
     }
     const cardToDelete = await Card.findByIdAndRemove(req.params.id)
-      .populate('likes');
-    res.status(200).send({ message: 'card deleted:', data: cardToDelete });
+      .populate('likes').populate('owner');
+    return res.status(200).send({ message: 'card deleted:', data: cardToDelete });
   } catch (err) {
-    next(err); // passes the data to errorHandler middleware
+    return next(err); // passes the data to errorHandler middleware
   }
 });
 
@@ -48,12 +49,13 @@ const likeCard = (async (req, res, next) => {
   try {
     const card = await Card.findById(req.params.id);
     if (!card) {
-      throw new NotFoundError('Not Found');
+      next(new NotFoundError('Not Found'));
     }
     const cardToUpdate = await Card.findByIdAndUpdate(req.params.id, {
       $addToSet: { likes: req.user._id },
     }, { new: true })
-      .populate('likes');
+      .populate('likes')
+      .populate('owner');
     res.status(200).send({ data: cardToUpdate });
   } catch (err) {
     next(err); // passes the data to errorHandler middleware
@@ -70,7 +72,8 @@ const dislikeCard = (async (req, res, next) => {
     const cardToDislike = await Card.findByIdAndUpdate(req.params.id, {
       $pull: { likes: req.user._id },
     }, { new: true })
-      .populate('likes');
+      .populate('likes')
+      .populate('owner');
     res.status(200).send({ message: 'like removed:', data: cardToDislike });
   } catch (err) {
     next(err); // passes the data to errorHandler middleware
