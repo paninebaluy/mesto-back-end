@@ -37,7 +37,10 @@ const deleteCard = (async (req, res, next) => {
   try {
     const { id } = req.params;
     const card = await Card.findById(id);
-    if (card && !card.owner.equals(req.user._id)) {
+    if (!card) {
+      return next(new NotFoundError('Not Found')); // здесь проверка, не удалена ли уже карточка
+    }
+    if (!card.owner.equals(req.user._id)) {
       return next(new ForbiddenError('Unauthorized')); // passes the data to errorHandler middleware
     }
     const cardToDelete = await Card.findByIdAndRemove(id)
