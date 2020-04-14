@@ -1,5 +1,13 @@
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/user');
 const NotFoundError = require('../errors/notFoundError');
+const UnauthorizedError = require('../errors/unauthorizedError');
+const BadRequestError = require('../errors/badRequestError');
+
+const { JWT_SECRET } = process.env;
 
 // GET /users — возвращает всех пользователей
 const getAllUsers = (async (req, res, next) => {
@@ -28,11 +36,29 @@ const getUser = (async (req, res, next) => {
 // POST /users — создаёт пользователя
 const createUser = (async (req, res, next) => {
   try {
-    const { name, about, avatar } = req.body;
-    const user = await User.create({ name, about, avatar });
-    res.status(201).send({ data: user });
+    const {
+      name, about, avatar, email, password,
+    } = req.body;
+    if (password.length < 8) {
+      return next(new BadRequestError('Password must be at least 8 symbols long'));
+    }
+    const hash = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name, about, avatar, email, password: hash,
+    });
+    return res.status(201).send({
+      data: {
+        _id: user._id,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      },
+    }); // данные всех полей должны приходить в теле запроса (кроме пароля)
   } catch (err) {
-    next(err); // passes the data to error handler
+    if (err instanceof mongoose.Error.ValidationError) {
+      return next(new BadRequestError(err.message));
+    }
+    return next(err); // passes the data to error handler
   }
 });
 
@@ -42,9 +68,12 @@ const updateUserProfile = (async (req, res, next) => {
     const { name, about } = req.body;
     const user = await User.findByIdAndUpdate(req.user._id, { name, about },
       { new: true, runValidators: true });
-    res.status(200).send({ data: user });
+    return res.status(200).send({ data: user });
   } catch (err) {
-    next(err); // passes the data to error handler
+    if (err instanceof mongoose.Error.ValidationError) {
+      return next(new BadRequestError(err.message));
+    }
+    return next(err); // passes the data to error handler
   }
 });
 
@@ -54,9 +83,34 @@ const updateUserAvatar = (async (req, res, next) => {
     const { avatar } = req.body;
     const user = await User.findByIdAndUpdate(req.user._id, { avatar },
       { new: true, runValidators: true });
-    res.status(200).send({ data: user });
+    return res.status(200).send({ data: user });
   } catch (err) {
-    next(err); // passes the data to error handler
+    if (err instanceof mongoose.Error.ValidationError) {
+      return next(new BadRequestError(err.message));
+    }
+    return next(err); // passes the data to error handler
+  }
+});
+
+// login - получает из запроса почту и пароль и проверяет их
+const login = (async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findUserByEmail(email, password);
+    const token = await jwt.sign(
+      { _id: user._id },
+      JWT_SECRET,
+      { expiresIn: '7d' },
+    );
+    res.cookie('jwt', token, JWT_SECRET, { // JWT после создания должен быть отправлен клиенту
+      maxAge: '7d',
+      httpOnly: true,
+      secure: true,
+      sameSite: true,
+    });
+    res.status(200).send({ token });
+  } catch (err) {
+    next(new UnauthorizedError(err.message)); // passes the data to error handler
   }
 });
 
@@ -66,4 +120,5 @@ module.exports = {
   createUser,
   updateUserProfile,
   updateUserAvatar,
+  login,
 };
