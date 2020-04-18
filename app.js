@@ -9,7 +9,6 @@ const helmet = require('helmet');
 const router = require('./routes');
 const { createUser, login } = require('./controllers/users');
 const errorHandler = require('./middleware/errorHandler');
-const { PORT } = require('./config');
 const auth = require('./middleware/auth');
 
 const app = express();
