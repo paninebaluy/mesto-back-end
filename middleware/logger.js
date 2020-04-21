@@ -7,14 +7,20 @@ const requestLogger = expressWinston.logger({
     new winston.transports.File({
       level: 'info',
       filename: 'request.log',
-      handleExceptions: true,
+      handleExceptions: false,
       json: true,
       maxsize: 1048576, // 1MB
-      colorize: true,
+      colorize: false,
+      prettyPrint: true,
+      timestamp: true,
+      maxFiles: 1,
     }),
   ],
-  format: winston.format.json(),
-  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp({ format: 'dd MMM YYYY, HH:mm:ss ZZ' }),
+    winston.format.json(),
+  ),
+  levels: winston.config.syslog.levels,
   exitOnError: false,
 });
 
@@ -23,15 +29,21 @@ const errorLogger = expressWinston.errorLogger({
   transports: [
     new winston.transports.File({
       filename: 'error.log',
-      level: 'error, crit',
+      level: 'error',
       handleExceptions: true,
       json: true,
       maxsize: 1048576, // 1MB
-      colorize: true,
+      colorize: false,
+      prettyPrint: true,
+      timestamp: true,
+      maxFiles: 1,
     }),
   ],
-  format: winston.format.json(),
-  level: 'error, crit',
+  format: winston.format.combine(
+    winston.format.timestamp({ format: 'dd MMM YYYY, HH:mm:ss ZZ' }),
+    winston.format.json(),
+  ),
+  levels: winston.config.syslog.levels,
   exitOnError: false,
 });
 
