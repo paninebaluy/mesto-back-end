@@ -6,7 +6,11 @@ const requestLogger = expressWinston.logger({
   transports: [
     new winston.transports.File({
       level: 'info',
+<<<<<<< HEAD
       filename: 'request.log',
+=======
+      filename: 'info.log',
+>>>>>>> 22fb3e0a6b2327b272dd69eee74e283e887702b1
       handleExceptions: false,
       json: true,
       maxsize: 1048576, // 1MB
