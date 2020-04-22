@@ -12,9 +12,9 @@ Server-side validation is handled with celebrate library, requests and errors ar
 
 ## Availability
 
-Front end part of this web site may be found here: https://mestamno.ga/
-Back end API: https://api.mestamno.ga/
-Public back end server IP address: https://84.201.133.185/
+- Front end part of this web site may be found here: https://mestamno.ga/
+- Back end API: https://api.mestamno.ga/
+- Public back end server IP address: https://84.201.133.185/
 
 ### How to start using it locally:
 
@@ -88,9 +88,9 @@ JWT-токен хранится в http-куках запроса.
 
 ## Доступность
 
-Фронтенд с сайтом находится по адресу: https://mestamno.ga/
-Бэкенд и API доступны: https://api.mestamno.ga/
-Публичный IP-адрес бэкенд-сервера: https://84.201.133.185/
+- Фронтенд с сайтом находится по адресу: https://mestamno.ga/
+- Бэкенд и API доступны: https://api.mestamno.ga/
+- Публичный IP-адрес бэкенд-сервера: https://84.201.133.185/
 
 ### Как запустить его локально
 
