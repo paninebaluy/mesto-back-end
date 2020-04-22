@@ -1,5 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 const BadRequestError = require('../errors/badRequestError');
+const UnauthorizedError = require('../errors/unauthorizedError');
 
 const errors = {
   about: new BadRequestError('"About" must contain 2 to 30 symbols'),
@@ -9,6 +10,7 @@ const errors = {
   password: new BadRequestError('Password must contain at least 8 characters'),
   link: new BadRequestError('Link must be a valid URL'),
   id: new BadRequestError('Must be a Mongoose ObjectID'),
+  login: new UnauthorizedError('The email or password you entered are not valid'),
 };
 
 const userValidator = celebrate({
@@ -31,9 +33,9 @@ const userValidator = celebrate({
 const loginValidator = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email()
-      .error(errors.email),
+      .error(errors.login),
     password: Joi.string().required().min(8)
-      .error(errors.password),
+      .error(errors.login),
   }),
 });
 
