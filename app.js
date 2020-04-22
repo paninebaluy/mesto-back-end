@@ -34,4 +34,10 @@ app.use('/', auth, router); // защитите авторизацией все 
 // an error handler is the last middleware:
 app.use(errorHandler);
 
+<<<<<<< HEAD
 module.exports = app;
+=======
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
+});
+>>>>>>> 1d44d1fec2488dab1e76c3eb7a102438a6c3ad00
