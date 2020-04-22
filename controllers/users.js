@@ -39,9 +39,6 @@ const createUser = (async (req, res, next) => {
     const {
       name, about, avatar, email, password,
     } = req.body;
-    if (password.length < 8) {
-      return next(new BadRequestError('Password must be at least 8 symbols long'));
-    }
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
       name, about, avatar, email, password: hash,
@@ -52,6 +49,7 @@ const createUser = (async (req, res, next) => {
         name: user.name,
         about: user.about,
         avatar: user.avatar,
+        email: user.email,
       },
     }); // данные всех полей должны приходить в теле запроса (кроме пароля)
   } catch (err) {
