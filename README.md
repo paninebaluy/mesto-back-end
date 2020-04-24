@@ -2,7 +2,7 @@
 ## EN
 [на русском](#ru)
 
-_v3.1.0 &ndash; added validation with celebrate_
+_v3.1.1 &ndash; added a dev secret key for dev mode, fixed regexes for urls and password_
 
 Mesto is a single page project, part of sprints 13, 14 and 15 in [Yandex.Praktikum](https://praktikum.yandex.ru/profile/web-developer/) study program.
 It's an interactive web page for sharing pictures with short titles.
@@ -79,7 +79,7 @@ It's way more convenient to test routing scenarios using [Postman](https://www.p
 # [Mesto](https://mestamno.ga/)
 ## RU
 
-_v3.1.0 добавлена валидация при помощи celebrate_
+_v3.1.1 исправлены регэкспы для ссылок и пароля, добавлен секрет к режиму разработки_
 
 Место &mdash; одностраничный проект, созданный в рамках 13-го, 14-го и 15-го спринтов учебной программы [Яндекс.Практикума](https://praktikum.yandex.ru/profile/web-developer/). Это интерактивный сайт, пользователи которого могут делиться изображениями с кратким названием.
 Этот проект сосредоточен на бэкенде сайта, где роутинг реализован на Node.js и Exress.js, а также подключена база данных на MongoDB посредством Mongoose.
