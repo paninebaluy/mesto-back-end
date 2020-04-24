@@ -50,10 +50,4 @@ app.use(errorLogger); // error logging middleware must be connected before error
 app.use(errors()); // celebrate error handler
 app.use(errorHandler); // a centralized error handler is the last middleware
 
-<<<<<<< HEAD
 module.exports = app;
-=======
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
->>>>>>> 1d44d1fec2488dab1e76c3eb7a102438a6c3ad00
