@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cookies = require('cookie-parser');
 const helmet = require('helmet'); // sets HTTP headers for security
 const { errors } = require('celebrate'); // validation middleware (checks data before passing it to controller)
+const rateLimit = require('express-rate-limit'); // used to limit repeated requests to public APIs and/or endpoints such as password reset
 
 const router = require('./routes');
 const { createUser, login } = require('./controllers/users');
@@ -15,6 +16,11 @@ const { requestLogger, errorLogger } = require('./middleware/logger');
 const { userValidator, loginValidator } = require('./middleware/validation-celebrate');
 
 const app = express();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // timeframe for which requests are checked/remebered: 15 minutes
+  max: 50, // limit each IP to 50 requests per windowMs
+  message: 'Please try again later',
+});
 
 app.use(helmet());
 // app.disable('x-powered-by');
@@ -31,6 +37,7 @@ app.use(bodyParser.json()); // for parsing data as JSON
 app.use(bodyParser.urlencoded({ extended: true })); // accepting various file types in POST requests
 app.use(cookies());
 app.use(requestLogger); // request logging middleware must be connected before all routes
+app.use(limiter); // express rate limit is applied to all requests
 
 // crash test
 app.get('/crash-test', () => {
