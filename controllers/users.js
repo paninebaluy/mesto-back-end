@@ -7,7 +7,7 @@ const NotFoundError = require('../errors/notFoundError');
 const UnauthorizedError = require('../errors/unauthorizedError');
 const BadRequestError = require('../errors/badRequestError');
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET } = require('../config');
 
 // GET /users — возвращает всех пользователей
 const getAllUsers = (async (req, res, next) => {
