@@ -7,7 +7,7 @@ const NotFoundError = require('../errors/notFoundError');
 const UnauthorizedError = require('../errors/unauthorizedError');
 const BadRequestError = require('../errors/badRequestError');
 
-const { JWT_SECRET } = require('../config');
+const { JWT_SECRET, whatsTheSecret } = require('../config');
 
 // GET /users — возвращает всех пользователей
 const getAllUsers = (async (req, res, next) => {
@@ -95,6 +95,7 @@ const login = (async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findUserByEmail(email, password);
+    whatsTheSecret();
     const token = await jwt.sign(
       { _id: user._id },
       JWT_SECRET,

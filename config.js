@@ -5,11 +5,14 @@ const PORT = process.env.PORT || 3000;
 
 const isProduction = process.env.NODE_ENV === 'production'; // if production, we use secret from env file
 
-const JWT_SECRET = () => {
+let JWT_SECRET;
+const whatsTheSecret = () => {
   if (isProduction) {
-    return process.env.JWT_SECRET;
+    JWT_SECRET = process.env.JWT_SECRET;
+    return JWT_SECRET;
   }
-  return 'devSecretKey'; // for dev mode, we use 'devSecretKey'
+  JWT_SECRET = 'devSecretKey';
+  return JWT_SECRET; // for dev mode, we use 'devSecretKey'
 };
 
 const connectToMongoDB = (async () => {
@@ -35,6 +38,7 @@ const rateLimiter = rateLimit({
 module.exports = {
   PORT,
   JWT_SECRET,
+  whatsTheSecret,
   connectToMongoDB,
   rateLimiter,
 };

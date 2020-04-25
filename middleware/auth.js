@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config');
+const { JWT_SECRET, whatsTheSecret } = require('../config');
 
 const UnauthorizedError = require('../errors/unauthorizedError');
 
@@ -9,6 +9,7 @@ const auth = (req, res, next) => {
     if (!token) {
       return next(new UnauthorizedError('No token supplied'));
     }
+    whatsTheSecret();
     return jwt.verify(token, JWT_SECRET, (err, payload) => {
       if (err) {
         return next(new UnauthorizedError('Invalid token'));
