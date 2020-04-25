@@ -4,16 +4,7 @@ const rateLimit = require('express-rate-limit'); // used to limit repeated reque
 const PORT = process.env.PORT || 3000;
 
 const isProduction = process.env.NODE_ENV === 'production'; // if production, we use secret from env file
-
-let JWT_SECRET;
-const whatsTheSecret = () => {
-  if (isProduction) {
-    JWT_SECRET = process.env.JWT_SECRET;
-    return JWT_SECRET;
-  }
-  JWT_SECRET = 'devSecretKey';
-  return JWT_SECRET; // for dev mode, we use 'devSecretKey'
-};
+const JWT_SECRET = isProduction ? process.env.JWT_SECRET : 'devSecretKey'; // for dev mode, we use 'devSecretKey'
 
 const connectToMongoDB = (async () => {
   try {
@@ -38,7 +29,6 @@ const rateLimiter = rateLimit({
 module.exports = {
   PORT,
   JWT_SECRET,
-  whatsTheSecret,
   connectToMongoDB,
   rateLimiter,
 };
