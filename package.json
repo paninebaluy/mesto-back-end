@@ -1,6 +1,6 @@
 {
   "name": "sprint15",
-  "version": "3.0.1",
+  "version": "3.1.2",
   "description": "Praktikum 15 project. That is a Praktikum 11 project plus routing with Express.js, connection to MongoDB via Mongoose, authorization + authentication and tests. For more info, see Readme.md",
   "main": "app.js",
   "scripts": {
